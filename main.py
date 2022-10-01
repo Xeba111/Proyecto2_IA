@@ -90,12 +90,14 @@ def uniform_cost_search(problem):
     reached[problem.initial] = node
     while frontier:
         node, costo = frontier.remove()
-        #print("Elemento removido de frontier: " + str(node.state))
+        print("\n\n")
         print("Nodo actual: " + str(node.state))
-        # if node.parent:
-        #     #print("Nodo padre: " + str(node.parent.state))
-        # else:
-        #     #print("Nodo padre: No tiene")
+        print("Costo acumulado: " + str(node.path_cost))
+        print("Número de nodos expandidos actualmente: " + str(len(reached)))
+        if node.parent:
+            print("Nodo padre: " + str(node.parent.state))
+        else:
+            print("Nodo padre: No tiene")
         nodes = []
         for action in problem.actions(node.state):
             nodes.append(action)
@@ -107,7 +109,6 @@ def uniform_cost_search(problem):
             if s not in reached or child.path_cost < reached[s].path_cost:
                 reached[s] = child
                 frontier.insert((child, child.path_cost), child.path_cost)
-                #print("Elemento añadido a frontier: " + str(child.state))
 
     return None
 
@@ -115,52 +116,30 @@ def uniform_cost_search(problem):
 def a_star_search(problem):
     node = Node(problem.initial)
     frontier = PriorityQueue()
-    frontier.insert((node, node.path_cost), node.path_cost)
+    frontier.insert((node, node.path_cost), node.path_cost+node.shortest_cost)
     reached = dict()
     reached[problem.initial] = node
     while frontier:
         node, costo = frontier.remove()
+        print("\n\n")
         print("Nodo actual: " + str(node.state))
-        # print("Camino: " + str(node.path_cost))
-        # print("Camino más corto: " + str(node.shortest_cost))
-
-        # if node.parent:
-        #     #print("Nodo padre: " + str(node.parent.state))
-        # else:
-        #     #print("Nodo padre: No tiene")
+        print("Costo acumulado: " + str(node.path_cost))
+        print("Distancia desde nodo actual hasta objetivo: " + str(node.shortest_cost))
+        print("Número de nodos expandidos actualmente: " + str(len(reached)))
+        if node.parent:
+            print("Nodo padre: " + str(node.parent.state))
+        else:
+            print("Nodo padre: No tiene")
         nodes = []
         for action in problem.actions(node.state):
             nodes.append(action)
-        # print("Nodos hijos: " + str(nodes))
-        num_hijos = len(nodes)
         if problem.goal_test(node.state):
             return node
-        if problem.goal not in nodes:
-            counter = 0
-            solution_node = node
-            if num_hijos > 0:
-                for child in expand(node, problem):
-                    if counter > 0:
-                        if solution_node.path_cost + solution_node.shortest_cost > child.path_cost + child.shortest_cost:
-                            solution_node = child
-                    else:
-                        solution_node = child
-                        counter = counter + 1
-                frontier.insert((solution_node, solution_node.path_cost), solution_node.path_cost)
-
-        # list_nodes = expand(node, problem)
-        # for child in list_nodes:
-        #     print(child.state)
-        # # print(type(list_nodes))
-        # # print(num_hijos)
-        # counter = 0
-        # solution_node = list_nodes[counter]
-        # if num_hijos > 0:
-        #     while counter+1 < num_hijos:
-        #         if solution_node.path_cost + solution_node.shortest_cost > list_nodes[counter+1].path_cost + list_nodes[counter+1].shortest_cost:
-        #             solution_node = list_nodes[counter + 1]
-        #         counter = counter+1
-        #     frontier.insert((solution_node, solution_node.path_cost), solution_node.path_cost)
+        for child in expand(node, problem):
+            s = child.state
+            if s not in reached or child.path_cost + child.shortest_cost < reached[s].path_cost + reached[s].shortest_cost:
+                reached[s] = child
+                frontier.insert((child, child.path_cost), child.path_cost)
 
     return None
 
@@ -181,10 +160,10 @@ distancia = dict(Ellensburg=516, Pendleton=472, Spokane=362, Missoula=232,
 
 problema = Problem("Ellensburg", "Havre", costos, distancia)
 
-#bfs = uniform_cost_search(problema)
-#print("\n\n\n")
+bfs = uniform_cost_search(problema)
+print("\n\n")
 ass = a_star_search(problema)
-
-#print(bfs.solution())
-print("\n\n\n")
+print("\n\nSoluciones")
+print(bfs.solution())
+print("\n")
 print(ass.solution())
